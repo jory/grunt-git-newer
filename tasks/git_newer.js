@@ -19,7 +19,11 @@ function spawnSync(command, args, grunt) {
 }
 
 function createTask(grunt, base, branch) {
+  console.log("createTask");
+
   function filterFiles(files, diff) {
+
+    console.log("filterFiles");
 
     return grunt.file.expand(files).map(function(file) {
       return path.resolve(file);
@@ -29,6 +33,8 @@ function createTask(grunt, base, branch) {
   }
 
   return function(taskName, targetName) {
+
+    console.log("->");
 
     var prefix = this.name;
     var tasks = [];
@@ -44,14 +50,22 @@ function createTask(grunt, base, branch) {
           tasks.push(prefix + ':' + taskName + ':' + targetName);
         }
       });
+
+      console.log("running these tasks", tasks);
+
       return grunt.task.run(tasks);
     }
 
     if (branch === 'master') {
+
+      console.log("running these tasks on master", tasks);
+
       grunt.task.run(tasks);
     }
 
     var done = this.async();
+
+    console.log("About to reconfigure the config");
 
     var originalConfig = grunt.config.get([taskName, targetName]);
     var config = grunt.util._.clone(originalConfig);
@@ -82,6 +96,9 @@ function createTask(grunt, base, branch) {
     }
 
     grunt.config.set([taskName, targetName], config);
+
+    console.log("running ", taskName, targetName);
+
     grunt.task.run([taskName + ':' + targetName]);
     done();
   };
